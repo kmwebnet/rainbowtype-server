@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xterm@4.5.0/lib/xterm.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@4.5.0/css/xterm.css"/>
+</head>
+<body>
+    
+<div id="terminal"></div>
+paste area:<br>
+<form name="form1">
+<textarea id="paste_area" style="width:100%; height:200px; margin:0px 0px 5px 0px;"></textarea>
+</form>
+<input type="button" value="submit" onclick="clickBtn1()"/>
+<script type="text/javascript">
+var rsocket;
+
+var wsUrl = 'wss://<your server ip:port>/rtserver';
+
+
+var term = new Terminal({cursorBlink: true,fontFamily: "Consolas, 'Courier New', monospace"});
+var element = document.getElementById('terminal')
+term.open(element);
+
+socket = new WebSocket(wsUrl);
+
+socket.binaryType = 'blob';
+
+
+
+
+socket.onmessage = function(e) {
+
+    var reader = new FileReader();
+
+    if(typeof e.data === "string"){
+    term.write ((new TextEncoder).encode(e.data));
+    }else{
+    reader.readAsArrayBuffer(e.data);
+    reader.onload = function() {
+    var result = new Uint8Array(reader.result); // reader.result is ArrayBuffer
+    term.write (result);
+    };
+    }; 
+
+};
+
+
+term.onKey((data) => {
+    socket.send(data.key);  
+    });
+
+function clickBtn1(){
+	const ta1 = document.form1.paste_area.value; 
+	socket.send(ta1);
+	document.form1.paste_area.value = "";
+}
+
+
+</script>
+    
+</body>
+</html>
