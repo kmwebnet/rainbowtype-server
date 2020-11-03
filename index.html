@@ -16,7 +16,7 @@ paste area:<br>
 <script type="text/javascript">
 var rsocket;
 
-var wsUrl = 'wss://<your server ip:port>/rtserver';
+var wsUrl = 'wss://' + window.location.host + '/rtserver';
 
 
 var term = new Terminal({cursorBlink: true,fontFamily: "Consolas, 'Courier New', monospace"});
